@@ -1,4 +1,5 @@
 #include "gex-media.h"
+#include "gex-cd.h"
 
 #include <glib.h>
 #include <locale.h>
@@ -19,7 +20,7 @@ gex_media_fixture_tear_down (GexMediaFixture *fixture,
 {
 }
 
-static void test_new(GexMediaFixture *fixture,
+static void test_media_new(GexMediaFixture *fixture,
                      gconstpointer user_data)
 {
   GexMedia *m = gex_media_new();
@@ -98,18 +99,57 @@ static void test_unpacked_signals(GexMediaFixture *fixture,
   g_object_unref(m);
 }
 
+static void test_cd_new(GexMediaFixture *fixture,
+                        gconstpointer user_data)
+{
+  GexCD *cd = gex_cd_new();
+  g_assert_nonnull(cd);
+
+  g_object_unref(cd);
+}
+
+static void test_cd_throw_out_signals(GexMediaFixture *fixture,
+                         gconstpointer user_data)
+{
+  GexCD *cd = gex_cd_new();
+  gboolean return_value;
+  g_signal_emit_by_name(cd, "throw-out", TRUE, &return_value);
+  g_object_unref(cd);
+}
+
+static void test_cd_unpacked_signals(GexMediaFixture *fixture,
+                         gconstpointer user_data)
+{
+  GexCD *cd = gex_cd_new();
+  gboolean return_value;
+
+  gboolean orig_package;
+  g_object_get(cd, "orig-package", &orig_package, NULL);
+  g_assert(orig_package);
+
+  g_signal_emit_by_name(cd, "unpacked", &return_value);
+  g_object_get(cd, "orig-package", &orig_package, NULL);
+  g_assert(orig_package);
+  g_object_unref(cd);
+}
+
 int main(int argc, char **argv) {
 
   setlocale (LC_ALL, "");
 
   g_test_init (&argc, &argv, NULL);
 
-  g_test_add("/media/test_new", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_new, gex_media_fixture_tear_down);
+  g_test_add("/media/test_media_new", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_media_new, gex_media_fixture_tear_down);
   g_test_add("/media/test_dflt_inv_nr", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_dflt_inv_nr, gex_media_fixture_tear_down);
   g_test_add("/media/test_inv_nr_property", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_inv_nr_property, gex_media_fixture_tear_down);
   g_test_add("/media/test_dflt_orig_package", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_dflt_orig_package, gex_media_fixture_tear_down);
   g_test_add("/media/test_orig_package_property", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_orig_package_property, gex_media_fixture_tear_down);
   g_test_add("/media/test_throw_out_signals", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_throw_out_signals, gex_media_fixture_tear_down);
   g_test_add("/media/test_unpacked_signals", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_unpacked_signals, gex_media_fixture_tear_down);
+
+
+  g_test_add("/media/test_cd_new", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_cd_new, gex_media_fixture_tear_down);
+  g_test_add("/media/test_cd_throw_out_signals", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_cd_throw_out_signals, gex_media_fixture_tear_down);
+  g_test_add("/media/test_cd_unpacked_signals", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_cd_unpacked_signals, gex_media_fixture_tear_down);
   return g_test_run();
 }

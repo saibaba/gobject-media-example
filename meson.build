@@ -6,7 +6,7 @@ glib = dependency('glib-2.0')
 gobj = dependency('gobject-2.0')
 deps = [glib, gobj]
 
-srcs = ['gex-media.c', 'main.c']
+srcs = ['gex-media.c', 'gex-cd.c', 'main.c']
 
 test(
   'test_media',
