@@ -1,5 +1,5 @@
 #include "gex-cd.h"
-
+#include "gex-cleanable.h"
 
 typedef struct _GexCD
 {
@@ -7,7 +7,27 @@ typedef struct _GexCD
   gboolean writable;
 } GexCD;
 
-G_DEFINE_TYPE(GexCD, gex_cd, GEX_TYPE_MEDIA)
+
+static void gex_cd_cleanable_init(gpointer interface, gpointer data);
+
+G_DEFINE_TYPE_WITH_CODE(GexCD, gex_cd, GEX_TYPE_MEDIA, G_IMPLEMENT_INTERFACE(GEX_TYPE_CLEANABLE, gex_cd_cleanable_init))
+
+static void gex_cd_clean(GexCleanable *cleanable)
+{
+  GEX_IS_CD(GEX_CD(cleanable));
+  g_print("Cleaning CD.\n");
+}
+
+static void gex_cd_cleanable_init(gpointer interface, gpointer data)
+{
+  GexCleanableInterface *cleanable = interface;
+  g_assert(G_TYPE_FROM_INTERFACE(cleanable) == GEX_TYPE_CLEANABLE);
+
+  // g_assert(cleanable_base_init_count > 0);
+
+  cleanable->clean = gex_cd_clean;
+}
+
 
 GexCD *gex_cd_new()
 {
@@ -33,7 +53,7 @@ static void unpacked_cd()
 static void gex_cd_class_init(GexCDClass *klass)
 {
 
-  GObjectClass *g_object_class;
+  // GObjectClass *g_object_class;
   GexMediaClass *media_class;
   media_class = GEX_MEDIA_CLASS(klass);
   media_class->unpacked = unpacked_cd;

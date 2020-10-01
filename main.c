@@ -1,5 +1,6 @@
 #include "gex-media.h"
 #include "gex-cd.h"
+#include "gex-cleanable.h"
 
 #include <glib.h>
 #include <locale.h>
@@ -133,6 +134,15 @@ static void test_cd_unpacked_signals(GexMediaFixture *fixture,
   g_object_unref(cd);
 }
 
+static void test_cd_clean(GexMediaFixture *fixture,
+                         gconstpointer user_data)
+{
+  GexCD *cd = gex_cd_new();
+  gex_cleanable_clean(GEX_CLEANABLE(cd));
+
+  g_object_unref(cd);
+}
+
 int main(int argc, char **argv) {
 
   setlocale (LC_ALL, "");
@@ -151,5 +161,7 @@ int main(int argc, char **argv) {
   g_test_add("/media/test_cd_new", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_cd_new, gex_media_fixture_tear_down);
   g_test_add("/media/test_cd_throw_out_signals", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_cd_throw_out_signals, gex_media_fixture_tear_down);
   g_test_add("/media/test_cd_unpacked_signals", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_cd_unpacked_signals, gex_media_fixture_tear_down);
+
+  g_test_add("/media/test_cd_clean", GexMediaFixture, "some-user-data",  gex_media_fixture_set_up, test_cd_clean, gex_media_fixture_tear_down);
   return g_test_run();
 }
